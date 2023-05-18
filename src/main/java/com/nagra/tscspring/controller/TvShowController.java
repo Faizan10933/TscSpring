@@ -47,5 +47,30 @@ public class TvShowController {
         }
         return ResponseEntity.ok().body(characters);
     }
+
+
+    @PostMapping
+    public ResponseEntity<TvShow> addTvShow(@RequestBody TvShow tvShow) {
+        TvShow savedTvShow = tvShowRepository.save(tvShow);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedTvShow);
+    }
+
+    @PostMapping("/{tvShowId}/characters")
+    public ResponseEntity<Character> addCharacterToTvShow(
+            @PathVariable(value = "tvShowId") Long tvShowId,
+            @RequestBody Character character) {
+        Optional<TvShow> optionalTvShow = tvShowRepository.findById(tvShowId);
+        if (optionalTvShow.isPresent()) {
+            TvShow tvShow = optionalTvShow.get();
+            character.setTvShow(tvShow); // Set the TV show for the character
+            Character savedCharacter = characterRepository.save(character);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCharacter);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 }
+
 
